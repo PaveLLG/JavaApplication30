@@ -1,12 +1,9 @@
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Enumeration;
 
 public class JavaApplication30 {
     private static final String DRIVER_NAME =  "com.mysql.cj.jdbc.Driver";
-    private static final String CONN_STRING =  "jdbc:mysql://localhost:3306/?user=root&password=root";
+    private static final String CONN_STRING =  "jdbc:mysql://localhost:3306/?user=root&password=root&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
     public static void main(String[] args) {
 
@@ -15,6 +12,8 @@ public class JavaApplication30 {
         while (drivers.hasMoreElements())
             System.out.println(drivers.nextElement());
 
+        //установка драйвера
+
         try {
             Class.forName(DRIVER_NAME);
         } catch (ClassNotFoundException e) {
@@ -22,11 +21,34 @@ public class JavaApplication30 {
             return;
         }
 
+        //установка соединения
+
+        Connection conn = null;
+
         try {
-            Connection conn = DriverManager.getConnection(CONN_STRING);
+             conn = DriverManager.getConnection(CONN_STRING);
         } catch (SQLException e) {
             System.out.println("Cannot open connection! " + e.getMessage());
             return;
+        }
+
+        //
+        try{
+            Statement st = conn.createStatement();
+         //   st.executeUpdate("CREATE DATABASE db");
+           st.executeUpdate("USE db");
+         //  st.executeUpdate("CREATE TABLE persons (name varchar(32),age int(3))");
+         //  st.executeUpdate("INSERT INTO persons (name, age) VALUES ('Name12',21)");
+         ResultSet rs =   st.executeQuery("SELECT * FROM persons");
+         while (rs.next()){
+             System.out.println(rs.getString("name") +
+                     " - " +
+                     rs.getString("age")
+             );
+         }
+
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
         }
 
 
